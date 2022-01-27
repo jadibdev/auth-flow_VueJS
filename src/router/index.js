@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import store from "../store";
 
 import GuestLayout from "../layouts/GuestLayout.vue";
 import Home from "../views/Home.vue";
@@ -35,24 +36,39 @@ const routes = [
     path: "/dashboard",
     name: "Dashboard",
     component: DashboardLayout,
-    beforeEnter(to, from) {
+    beforeEnter(to, from, next) {
       console.log(to, from);
+      if (store.state.isAuthenticated) {
+        next();
+      } else {
+        next("/login");
+      }
+      // check if user is authenticated if not route to /login
     },
     children: [
       {
         path: "",
         name: "Dashboard",
         component: Dashboard,
+        meta: {
+          roles: ["Admin", "standard"],
+        },
       },
       {
         path: "/reports",
         name: "Reports",
         component: Reports,
+        meta: {
+          roles: ["Admin"],
+        },
       },
       {
         path: "/settings",
         name: "Settings",
         component: Settings,
+        meta: {
+          roles: ["Admin", "standard"],
+        },
       },
     ],
   },
